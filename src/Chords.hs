@@ -2,13 +2,14 @@
 {-# LANGUAGE LambdaCase #-}
 
 module Chords where
-
+import Data.Char
 import Data.Data
 import Data.List
 import Data.Maybe
 import qualified Data.Set as S
 import Debug.Trace
 import Control.Arrow
+import System.Environment
 
 -- ## DECLARATIONS ## --
 
@@ -45,11 +46,21 @@ data Fingering = Fingering {
   fingerFrets :: Fretboard
 }
 
+fingerChar :: String
+fingerChar =
+  let
+    isUnicodeSupported :: IO Bool
+    isUnicodeSupported = do
+      x <- mapM lookupEnv ["LANG", "LC_ALL", "LC_CTYPE"]
+      return (any (isInfixOf "UTF". map toUpper) $ catMaybes x)
+  in
+      if isUnicodeSupported then "●" else "o"
+
 showFingeringRow :: Int -> Fingering -> String
 showFingeringRow row (Fingering fingers fretboard) =
   unwords $ (\case
       _ | row == 0 -> "-"
-      Just finger | finger == row -> "●"
+      Just finger | finger == row -> fingerChar
       _ -> "|"
   ) <$> fingers
 
@@ -82,15 +93,15 @@ showHorizontally f@(Fingering fingers fretboard) =
     renderFret :: Fret -> String
     renderFret = rightPad2 . show . fretZero
     renderFinger :: Maybe Int -> String
-    renderFinger = runKleisli $ foldl1 (<+>) . fmap Kleisli $ 
+    renderFinger = runKleisli $ foldl1 (<+>) . fmap Kleisli $
       [ rightPad2 . maybe "X" show
       , const "|"
-      , \case 
+      , \case
                 Just 0 -> replicate (maxFinger - minFinger) '-'
-                Just finger -> replicate (finger - minFinger - 1) '-' ++ "●" ++ replicate (maxFinger - finger) '-'
+                Just finger -> replicate (finger - minFinger - 1) '-' ++ fingerChar ++ replicate (maxFinger - finger) '-'
                 Nothing -> replicate (maxFinger - minFinger) '-' ]
   in
-    unlines . reverse $ zipWith (\finger fret -> renderFret fret ++ renderFinger finger) fingers fretboard 
+    unlines . reverse $ zipWith (\finger fret -> renderFret fret ++ renderFinger finger) fingers fretboard
 
 instance Eq Fingering where
   (==) (Fingering fingers frets) (Fingering fingers' frets') = fingers == fingers'
@@ -190,7 +201,7 @@ isAwkward (Fingering ((Just f1):Nothing:(Just f2):fs) fb)
 isAwkward (Fingering (f:fs) fb) = isAwkward (Fingering fs fb)
 isAwkward (Fingering [] fb) = False
 
-  
+
 -- | Give me all the ways to produce a chord, when my fingers can only stretch so far.
 search :: Chord -> Int -> Fretboard -> [Fingering]
 search chord maxInterval frets =

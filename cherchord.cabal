@@ -1,8 +1,10 @@
--- This file has been generated from package.yaml by hpack version 0.28.2.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.1.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d28fc0542bce7bd37fd98df1dbf35f935f300386e76d99185040144864626d67
+-- hash: 364c09387e6543042fe437f3f2d38fe5c4fa80aa585c0d6bc612ce1be8d45bfc
 
 name:           cherchord
 version:        1.2.0
@@ -15,10 +17,9 @@ copyright:      2019
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
-cabal-version:  >= 1.10
 extra-source-files:
-    ChangeLog.md
     README.md
+    ChangeLog.md
 
 source-repository head
   type: git

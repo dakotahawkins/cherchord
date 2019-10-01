@@ -97,7 +97,7 @@ validInstruments i =
             optional $ char ','
             return $ Fret note (read num)
       Text.Megaparsec.some parseFret
-      
+
 parseOptions :: Parser AppOptions
 parseOptions = AppOptions <$>
   strArgument (metavar "CHORD") <*>
@@ -142,8 +142,8 @@ horizConcat = foldr1 horizConcatOne
         maxLine = maximum $ length <$> lines s
         heightDiff = max 0 (height - (length . lines $ s))
       in
-        unlines $ (\line -> line ++ replicate (maxLine - length line) ' ') <$> (lines s ++ replicate heightDiff "") 
-    
+        unlines $ (\line -> line ++ replicate (maxLine - length line) ' ') <$> (lines s ++ replicate heightDiff "")
+
     horizConcatOne :: String -> String -> String
     horizConcatOne str1 str2 =
       let
@@ -173,4 +173,4 @@ main = do
       putStrLn $ "printing out " ++ show (Prelude.min (amountToPrint opts) (length chords)) ++ " of them...\n"
       setSGR [Reset]
       let whichShow = if isHorizontal opts then showHorizontally else show
-      putStrLn . intercalate "\n" . map horizConcat . chunksOf 3 . map whichShow . take (amountToPrint opts) $ chords
+      putStrLn . intercalate "\n" . map horizConcat . chunksOf 3 . map whichShow . take (amountToPrint opts) $ chords isUnicodeSupported
